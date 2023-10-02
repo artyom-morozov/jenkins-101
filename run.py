@@ -23,6 +23,13 @@ def main(username, password):
     danger = f' Authorization: Basic {encoded_username}:{encoded_password}'
     logging.debug(danger)
     print_to_stdout(danger)
+    # Simulated credentials
+    credentials = "username:password"
+    # Encode the credentials in base64
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+
+    # Simulating a debug log print
+    print(f"DEBUG: Encoded credentials: {encoded_credentials}")
     print(danger)
 
 if __name__ == '__main__':

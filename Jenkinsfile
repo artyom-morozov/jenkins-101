@@ -21,10 +21,7 @@ pipeline {
         }
 
         stage('Run Python script') {
-            environment {
-                USERNAME_VAR = "${params.USERNAME}"
-                PASSWORD_VAR = "${params.PASSWORD}"
-            }
+
 
             steps {
                 script {
