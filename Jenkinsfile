@@ -1,38 +1,39 @@
 pipeline {
-    agent { 
-        node {
-            label 'docker-agent-python'
-            }
-      }
-    triggers {
-        pollSCM '* * * * *'
-    }
+    agent any
+
     stages {
-        stage('Build') {
+        stage('Cleanup Workspace') {
             steps {
-                echo "Building.."
-                sh '''
-                cd myapp
-                pip install -r requirements.txt
-                '''
+                cleanWs()
             }
         }
-        stage('Test') {
+
+        stage('Checkout') {
             steps {
-                echo "Testing.."
-                sh '''
-                cd myapp
-                python3 hello.py
-                python3 hello.py --name=Brad
-                '''
+                checkout([$class: 'GitSCM',
+                          branches: [[name: '*/master']],
+                          doGenerateSubmoduleConfigurations: false,
+                          extensions: [],
+                          submoduleCfg: [],
+                          userRemoteConfigs: [[url: 'https://github.com/artyom-morozov/jenkins-101.git']]
+                ])
             }
         }
-        stage('Deliver') {
+
+        stage('Run Python script') {
+            environment {
+                USERNAME_VAR = "${params.USERNAME}"
+                PASSWORD_VAR = "${params.PASSWORD}"
+            }
+
             steps {
-                echo 'Deliver....'
-                sh '''
-                echo "doing delivery stuff.."
-                '''
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'test_id', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh """
+                            python3 run.py $USERNAME $PASSWORD
+                        """
+                    }
+                }
             }
         }
     }
